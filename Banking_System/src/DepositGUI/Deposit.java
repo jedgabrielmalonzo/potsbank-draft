@@ -58,15 +58,40 @@ public class Deposit extends JFrame {
         btnEnter.addActionListener(e -> {
             try {
                 double amount = Double.parseDouble(textFieldAmount.getText());
-                transactionService.addDeposit(amount); // Push deposit into the shared Account_Statement
+                transactionService.addDeposit(amount);  // Adds deposit to the queue
                 JOptionPane.showMessageDialog(null, "Deposit processed: " + amount);
-                accountStatement.show(); // Show the updated Account_Statement
+                accountStatement.show(); // Refresh the account statement view
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(null, "Invalid input! Please enter a valid amount.");
             }
         });
         btnEnter.setBounds(115, 106, 89, 23);
         panel.add(btnEnter);
+        
+        JPanel panel_1 = new JPanel();
+        panel_1.setLayout(null);
+        panel_1.setBackground(new Color(0, 78, 168));
+        panel_1.setBounds(497, 0, 363, 501);
+        getContentPane().add(panel_1);
+        
+        JLabel lbltoCompleteYour = new JLabel("<html>To Complete your Deposit simply enter your amount you wish to deposit and confirm. Once submitted, you will receive a confimation message</html>");
+        lbltoCompleteYour.setHorizontalAlignment(SwingConstants.CENTER);
+        lbltoCompleteYour.setForeground(Color.WHITE);
+        lbltoCompleteYour.setFont(new Font("Tahoma", Font.BOLD, 13));
+        lbltoCompleteYour.setBounds(64, 88, 271, 306);
+        panel_1.add(lbltoCompleteYour);
+        
+        JLabel lblNewLabel_1 = new JLabel("Welcome to PotsBank");
+        lblNewLabel_1.setForeground(new Color(230, 245, 255));
+        lblNewLabel_1.setFont(new Font("Tahoma", Font.BOLD, 30));
+        lblNewLabel_1.setBounds(18, 33, 335, 64);
+        panel_1.add(lblNewLabel_1);
+        
+        JLabel lblNewLabel_1_1 = new JLabel("Your Trust, Our Commitment");
+        lblNewLabel_1_1.setForeground(new Color(252, 183, 21));
+        lblNewLabel_1_1.setFont(new Font("Tahoma", Font.ITALIC, 16));
+        lblNewLabel_1_1.setBounds(92, 90, 219, 35);
+        panel_1.add(lblNewLabel_1_1);
     }
 
     public static void main(String[] args) {

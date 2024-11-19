@@ -26,7 +26,7 @@ public class Account_Statement_Database {
 	        }
 	    }
 
-	    public static boolean insertAccountstatement(int Balance, int Deposit, int Withdrawal, int Date) {
+	    public static boolean insertAccountstatement(double balance, double deposit, double withdrawal, long timestamp) {
 	        Connection conn = null;
 	        PreparedStatement stmt = null;
 
@@ -34,11 +34,10 @@ public class Account_Statement_Database {
 	            conn = getConnection();
 	            String sql = "INSERT INTO accountstatement (Balance, Deposit, Withdrawal, Date) VALUES (?, ?, ?, ?)";
 	            stmt = conn.prepareStatement(sql);
-	            stmt.setInt(1, Balance);
-	            stmt.setInt(2, Deposit);
-	            stmt.setInt(3, Withdrawal);
-	            stmt.setInt(4, Date);
-	            
+	            stmt.setDouble(1, balance);   
+	            stmt.setDouble(2, deposit);   
+	            stmt.setDouble(3, withdrawal); 
+	            stmt.setTimestamp(4, new java.sql.Timestamp(timestamp)); 
 
 	            int rowsAffected = stmt.executeUpdate();
 	            return rowsAffected > 0;  
@@ -56,5 +55,4 @@ public class Account_Statement_Database {
 	            closeConnection(conn);
 	        }
 	    }
-
-	}
+}

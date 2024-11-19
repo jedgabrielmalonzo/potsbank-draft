@@ -1,52 +1,42 @@
 package CheckBalanceGUI;
 
-import javax.swing.table.DefaultTableModel;
-import java.util.Date;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class TransactionService {
     private Account_Statement accountStatement;
+    private Queue<Transaction> transactionQueue;
 
     public TransactionService(Account_Statement accountStatement) {
         this.accountStatement = accountStatement;
-    }
-
-   
-    public void addDeposit(double amount) {
-        double currentBalance = getCurrentBalance();
-        currentBalance += amount;
-        updateAccountStatement(currentBalance, amount, 0); 
-    }
-
-    
-    public boolean addWithdrawal(double amount) {
-        double currentBalance = getCurrentBalance();
-
-        
-        if (amount > currentBalance) {
-            return false; 
-        }
-
-        currentBalance -= amount; 
-        updateAccountStatement(currentBalance, 0, amount); 
-        return true; 
+        this.transactionQueue = new LinkedList<>();
     }
 
   
-    private double getCurrentBalance() {
-        DefaultTableModel model = accountStatement.getTableModel();
-
-        if (model.getRowCount() == 0) {
-            return 0.0; 
-        }
-
-      
-        return (double) model.getValueAt(model.getRowCount() - 1, 0);
+    public void addDeposit(double amount) {
+        Transaction transaction = new Transaction("deposit", amount);
+        transactionQueue.add(transaction);
+        processTransaction();  
     }
 
    
-    private void updateAccountStatement(double balance, double deposit, double withdrawal) {
-        DefaultTableModel model = accountStatement.getTableModel();
-        model.addRow(new Object[]{balance, deposit, withdrawal, new Date()});
-        accountStatement.refreshTable(); 
+    public void processTransaction() {
+        if (!transactionQueue.isEmpty()) {
+            Transaction transaction = transactionQueue.poll();  
+
+            if (transaction.getType().equals("deposit")) {
+                
+                double newBalance = accountStatement.getBalance() + transaction.getAmount();
+                accountStatement.updateBalance(newBalance, transaction.getAmount());
+                System.out.println("Deposit processed: " + transaction.getAmount());
+            } else if (transaction.getType().equals("withdrawal")) {
+                
+                double newBalance = accountStatement.getBalance() - transaction.getAmount();
+                accountStatement.updateBalance(newBalance, 0);
+                System.out.println("Withdrawal processed: " + transaction.getAmount());
+            }
+        }
     }
+
+	
 }
