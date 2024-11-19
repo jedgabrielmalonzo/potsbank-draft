@@ -4,9 +4,9 @@ import java.sql.*;
 
 public class login_database {
 
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/your_database_name";
+    private static final String DB_URL = "jdbc:mysql://localhost:3306/signup";
     private static final String DB_USER = "root";
-    private static final String DB_PASSWORD = "password";
+    private static final String DB_PASSWORD = "123jed";
 
     /**
      * Authenticate a user with the given username and password.
@@ -15,7 +15,7 @@ public class login_database {
      * @param password The password entered by the user.
      * @return True if authentication is successful, false otherwise.
      */
-    public static boolean authenticateUser(String username, String password) {
+    public static boolean authenticateUser(String userID, String password) {
         Connection conn = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -23,9 +23,9 @@ public class login_database {
         try {
             conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
 
-            String sql = "SELECT * FROM users WHERE username = ? AND password = ?";
+            String sql = "SELECT * FROM users WHERE UserID = ? AND Password = ?";
             stmt = conn.prepareStatement(sql);
-            stmt.setString(1, username);
+            stmt.setString(1, userID);
             stmt.setString(2, password); 
 
             rs = stmt.executeQuery();
