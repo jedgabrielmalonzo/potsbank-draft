@@ -2,9 +2,13 @@ package Login;
 
 import java.awt.*;
 import javax.swing.*;
+
+import DepositGUI.Deposit;
+
 import java.awt.event.*;
 
 import GUI.Home;
+import Signup.Signup;
 
 public class Login {
 
@@ -103,10 +107,15 @@ public class Login {
 
                 // Authenticate using database
                 if (login_database.authenticateUser(username, password)) {
-                    JOptionPane.showMessageDialog(frmLog, "Login successful!");
-                    Home home = new Home();
-                    home.setVisible(true);
-                    frmLog.dispose();
+                    int pin = login_database.getUserPin(username); // Retrieve PIN for the user
+                    if (pin != -1) { // Check if PIN is valid
+                        JOptionPane.showMessageDialog(frmLog, "Login successful! Your PIN is: " + pin);
+                        Home home = new Home(pin); // Pass PIN to the Home class
+                        home.setVisible(true);
+                        frmLog.dispose();
+                    } else {
+                        JOptionPane.showMessageDialog(frmLog, "Error retrieving PIN", "Error", JOptionPane.ERROR_MESSAGE);
+                    }
                 } else {
                     JOptionPane.showMessageDialog(frmLog, "Invalid username or password", "Error", JOptionPane.ERROR_MESSAGE);
                 }
@@ -125,6 +134,10 @@ public class Login {
         btnSignUp.setBackground(Color.WHITE);
         btnSignUp.setBounds(603, 357, 120, 37);
         frmLog.getContentPane().add(btnSignUp);
+        btnSignUp.addActionListener(e -> {
+        	Signup.main(new String[0]);  // Open Signup window
+            frmLog.dispose();    // Close Home window
+        });
 
         // Cancel button
         JButton btnCancel = new JButton("Cancel");

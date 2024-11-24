@@ -2,38 +2,27 @@ package CheckBalanceGUI;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+
+import GUI.Home;
+
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
 
 public class Account_Statement {
+
     private JFrame frmAccountStatement;
     private JTable table;
     private DefaultTableModel tableModel;
-    private double balance;
     private JComboBox<String> comboBox;
 
     public Account_Statement() {
         initialize();
-        this.balance = 0.0;
-    }
-
-    public double getBalance() {
-        return balance;
-    }
-
-    public void updateBalance(double newBalance, double depositAmount) {
-        this.balance = newBalance;
-        addTransactionToTable(depositAmount, 0, new Date());
-        refreshTable();
-    }
-
-    private void addTransactionToTable(double depositAmount, double withdrawalAmount, Date date) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String formattedDate = dateFormat.format(date);
-        tableModel.addRow(new Object[]{balance, depositAmount, withdrawalAmount, formattedDate});
+        loadTransactionsFromDatabase(); // Load transactions on initialization
     }
 
     private void initialize() {
@@ -52,7 +41,12 @@ public class Account_Statement {
         tableModel = new DefaultTableModel(
             new Object[][]{},
             new String[]{"Balance", "Deposit", "Withdrawal", "Date"}
-        );
+        ) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // Prevent editing of cells
+            }
+        };
         table.setModel(tableModel);
         scrollPane.setViewportView(table);
 
@@ -68,7 +62,8 @@ public class Account_Statement {
         panel.setBounds(819, 0, 363, 489);
         frmAccountStatement.getContentPane().add(panel);
 
-        JLabel lbltheAccountStatement = new JLabel("<html><br>The Account Statement Features</br><br> allows you to sort transactions by date or amount, making it easy to organize and view your account activity<br></html>");
+        JLabel lbltheAccountStatement = new JLabel(
+            "<html><br>The Account Statement Features</br><br> allows you to sort transactions by date or amount, making it easy to organize and view your account activity<br></html>");
         lbltheAccountStatement.setHorizontalAlignment(SwingConstants.CENTER);
         lbltheAccountStatement.setForeground(Color.WHITE);
         lbltheAccountStatement.setFont(new Font("Tahoma", Font.BOLD, 13));
@@ -87,19 +82,47 @@ public class Account_Statement {
         lblNewLabel_1_1.setBounds(92, 90, 219, 35);
         panel.add(lblNewLabel_1_1);
 
-        String[] options = {"Sort by Date", "Sort by Amount"};
+        String[] options = {"Sort by Date", "Sort by Deposit Amount", "Sort by Withdrawal Amount"};
         comboBox = new JComboBox<>(options);
         comboBox.setBackground(Color.WHITE);
         comboBox.setForeground(Color.BLACK);
         comboBox.setBounds(139, 441, 179, 22);
         frmAccountStatement.getContentPane().add(comboBox);
 
-        JButton btnNewButton = new JButton("Generate Account Statement");
-        btnNewButton.setBounds(482, 441, 207, 23);
-        btnNewButton.addActionListener(e -> handleGenerateStatement());
-        frmAccountStatement.getContentPane().add(btnNewButton);
+        JButton btnGenerateStatement = new JButton("Generate Account Statement");
+        btnGenerateStatement.setBounds(482, 441, 207, 23);
+        btnGenerateStatement.addActionListener(e -> handleGenerateStatement());
+        frmAccountStatement.getContentPane().add(btnGenerateStatement);
+        
+        JButton btnHome = new JButton("Home");
+        btnHome.setForeground(new Color(0, 78, 168));
+        btnHome.setFont(new Font("Tahoma", Font.BOLD, 15));
+        btnHome.setBackground(new Color(252, 183, 21));
+        btnHome.setBounds(10, 11, 100, 30);
+        frmAccountStatement.getContentPane().add(btnHome);
+        btnHome.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                Home homeWindow = new Home(0); 
+                homeWindow.setVisible(true);
+                frmAccountStatement.dispose(); 
+            }
+        });
     }
 
+    public void loadTransactionsFromDatabase() {
+        List<Transaction> transactions = Account_Statement_Database.fetchAllTransactions();
+
+        for (Transaction transaction : transactions) {
+            tableModel.addRow(new Object[]{
+                transaction.getBalance(),
+                transaction.getDeposit(),
+                transaction.getWithdrawal(),
+                new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(transaction.getDate()) // Convert Timestamp to String
+            });
+        }
+
+        refreshTable();
+    }
     private void handleGenerateStatement() {
         String selectedOption = (String) comboBox.getSelectedItem();
         if (selectedOption != null) {
@@ -116,12 +139,11 @@ public class Account_Statement {
                         }
                     });
                     break;
-                case "Sort by Amount":
-                    insertionSort(tableData, (row1, row2) -> {
-                        double amount1 = (double) row1[1];
-                        double amount2 = (double) row2[1];
-                        return Double.compare(amount1, amount2); // Ascending order by amount
-                    });
+                case "Sort by Deposit Amount":
+                    insertionSort(tableData, (row1, row2) -> Double.compare((double) row1[1], (double) row2[1]));
+                    break;
+                case "Sort by Withdrawal Amount":
+                    insertionSort(tableData, (row1, row2) -> Double.compare((double) row1[2], (double) row2[2]));
                     break;
             }
             updateTableData(tableData);
@@ -174,4 +196,15 @@ public class Account_Statement {
         Account_Statement accountStatement = new Account_Statement();
         accountStatement.show();
     }
+    
+    public void addTransaction(double balance, double deposit, double withdrawal, long timestamp) {
+        tableModel.addRow(new Object[]{
+            balance,
+            deposit,
+            withdrawal,
+            new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(timestamp))
+        });
+        refreshTable();
+    }
+    
 }

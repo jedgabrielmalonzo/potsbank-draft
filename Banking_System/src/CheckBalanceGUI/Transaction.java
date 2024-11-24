@@ -1,19 +1,33 @@
 package CheckBalanceGUI;
 
+import java.sql.Timestamp;
+
 public class Transaction {
-    private String type; 
-    private double amount;
+    private double balance;
+    private double deposit;
+    private double withdrawal;
+    private Timestamp date;
 
-    public Transaction(String type, double amount) {
-        this.type = type;
-        this.amount = amount;
+    public Transaction(double balance, double deposit, double withdrawal, Timestamp date) {
+        this.balance = balance;
+        this.deposit = deposit;
+        this.withdrawal = withdrawal;
+        this.date = date;
     }
 
-    public String getType() {
-        return type;
+    public double getBalance() {
+        return balance;
     }
 
-    public double getAmount() {
-        return amount;
+    public double getDeposit() {
+        return deposit;
+    }
+
+    public double getWithdrawal() {
+        return withdrawal;
+    }
+
+    public Timestamp getDate() {
+        return date;
     }
 }

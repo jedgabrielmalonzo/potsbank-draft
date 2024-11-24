@@ -6,28 +6,32 @@ import java.awt.Font;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
 import ChangePinGui.Change_Pin;
-import CheckBalanceGUI.Check_Balance;
+import CheckBalanceGUI.Account_Statement;
 import DepositGUI.Deposit;
 import WithdrawGUI.Withdraw;
+import Signup.Signup; // Import the Signup class
+
 
 public class Home extends JFrame {
+
+    // Assuming this is the generated PIN from the signup process
+	private int userPin; // Will hold the PIN fetched from the database
 
     /**
      * Launch the application.
      */
     public static void main(String[] args) {
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    Home window = new Home();
-                    window.setVisible(true);  // Set the visibility of this JFrame
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+        EventQueue.invokeLater(() -> {
+            try {
+                Home window = new Home(1234);
+                window.setVisible(true);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         });
     }
@@ -35,7 +39,8 @@ public class Home extends JFrame {
     /**
      * Create the application.
      */
-    public Home() {
+    public Home(int pin) {
+        this.userPin = pin; // Set the user's PIN
         getContentPane().setBackground(new Color(230, 245, 254));
         initialize();
     }
@@ -55,8 +60,10 @@ public class Home extends JFrame {
         btnDeposit.setForeground(new Color(0, 78, 168));
         btnDeposit.setFont(new Font("Tahoma", Font.BOLD, 15));
         btnDeposit.addActionListener(e -> {
-            Deposit.main(new String[0]);  // Open Deposit window
-            dispose();  // Close Home window
+            if (verifyPin()) {
+                Deposit.main(new String[0]);  // Open Deposit window
+                dispose();  // Close Home window
+            }
         });
         btnDeposit.setBounds(498, 174, 204, 54);
         getContentPane().add(btnDeposit);
@@ -67,8 +74,10 @@ public class Home extends JFrame {
         btnWithdraw.setForeground(new Color(0, 78, 168));
         btnWithdraw.setFont(new Font("Tahoma", Font.BOLD, 15));
         btnWithdraw.addActionListener(e -> {
-            Withdraw.main(new String[0]);  // Open Withdraw window
-            dispose();  // Close Home window
+            if (verifyPin()) {
+                Withdraw.main(new String[0]);  // Open Withdraw window
+                dispose();  // Close Home window
+            }
         });
         btnWithdraw.setBounds(498, 239, 204, 54);
         getContentPane().add(btnWithdraw);
@@ -79,8 +88,10 @@ public class Home extends JFrame {
         btnCheckBalance.setForeground(new Color(0, 78, 168));
         btnCheckBalance.setFont(new Font("Tahoma", Font.BOLD, 15));
         btnCheckBalance.addActionListener(e -> {
-            Check_Balance.main(new String[0]);  // Open Check Balance window
-            dispose();  // Close Home window
+            if (verifyPin()) {
+                Account_Statement.main(new String[0]);  
+                dispose();  
+            }
         });
         btnCheckBalance.setBounds(498, 314, 204, 54);
         getContentPane().add(btnCheckBalance);
@@ -89,11 +100,13 @@ public class Home extends JFrame {
         JButton btnChangePin = new JButton("Change Pin");
         btnChangePin.setBackground(new Color(252, 183, 21));
         btnChangePin.setForeground(new Color(0, 78, 168));
-        btnChangePin.addActionListener(e -> {
-        	Change_Pin.main(new String[0]);  
-            dispose();
-        });
         btnChangePin.setFont(new Font("Tahoma", Font.BOLD, 15));
+        btnChangePin.addActionListener(e -> {
+           
+                Change_Pin.main(new String[0]);  
+                dispose();
+            
+        });
         btnChangePin.setBounds(498, 379, 204, 54);
         getContentPane().add(btnChangePin);
 
@@ -130,5 +143,16 @@ public class Home extends JFrame {
         lblSubtitle.setForeground(new Color(245, 185, 19));
         lblSubtitle.setFont(new Font("Tahoma", Font.ITALIC, 15));
         getContentPane().add(lblSubtitle);
+    }
+
+    // Method to verify the user's PIN
+    private boolean verifyPin() {
+        String pinInput = JOptionPane.showInputDialog(this, "Please enter your PIN:", "PIN Required", JOptionPane.PLAIN_MESSAGE);
+        if (pinInput != null && Integer.toString(userPin).equals(pinInput)) {
+            return true; 
+        } else {
+            JOptionPane.showMessageDialog(this, "Invalid PIN. Please try again.", "Error", JOptionPane.ERROR_MESSAGE);
+            return false; 
+        }
     }
 }

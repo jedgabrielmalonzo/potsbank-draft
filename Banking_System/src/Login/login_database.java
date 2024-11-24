@@ -8,13 +8,7 @@ public class login_database {
     private static final String DB_USER = "root";
     private static final String DB_PASSWORD = "123jed";
 
-    /**
-     * Authenticate a user with the given username and password.
-     *
-     * @param username The username entered by the user.
-     * @param password The password entered by the user.
-     * @return True if authentication is successful, false otherwise.
-     */
+   
     public static boolean authenticateUser(String userID, String password) {
         Connection conn = null;
         PreparedStatement stmt = null;
@@ -44,5 +38,35 @@ public class login_database {
                 e.printStackTrace();
             }
         }
+    }
+    public static int getUserPin(String userID) {
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        int pin = -1; // Default value if not found
+
+        try {
+            conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+            String sql = "SELECT pin FROM users WHERE UserID = ?";
+            stmt = conn.prepareStatement(sql);
+            stmt.setString(1, userID);
+            rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                pin = rs.getInt("pin");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            // Close resources
+            try {
+                if (rs != null) rs.close();
+                if (stmt != null) stmt.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return pin; // Return the retrieved PIN
     }
 }

@@ -25,13 +25,13 @@ public class signup_database {
         }
     }
 
-    public static boolean insertUser(String FullName, String Email, int Phone, String Address, int UserID, String Password, String ConfirmPassword, String AccountType) {
+    public static boolean insertUser(String FullName, String Email, int Phone, String Address, int UserID, String Password, String ConfirmPassword, String AccountType, int pin) {
         Connection conn = null;
         PreparedStatement stmt = null;
 
         try {
             conn = getConnection();
-            String sql = "INSERT INTO users (FullName, Email, Phone, Address, UserID, Password, ConfirmPassword, AccountType) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO users (FullName, Email, Phone, Address, UserID, Password, ConfirmPassword, AccountType, pin) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
             stmt = conn.prepareStatement(sql);
             stmt.setString(1, FullName);
             stmt.setString(2, Email);
@@ -41,6 +41,7 @@ public class signup_database {
             stmt.setString(6, Password);
             stmt.setString(7, ConfirmPassword);
             stmt.setString(8, AccountType);
+            stmt.setInt(9, pin);
 
             int rowsAffected = stmt.executeUpdate();
             return rowsAffected > 0;  

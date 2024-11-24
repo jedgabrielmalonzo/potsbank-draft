@@ -6,6 +6,7 @@ import Login.Login;
 import java.awt.Font;
 import java.awt.Color;
 import java.awt.event.ActionListener;
+import java.util.Random;
 import java.awt.event.ActionEvent;
 
 public class Signup {
@@ -18,6 +19,7 @@ public class Signup {
     private JTextField textFieldPhone;
     private JTextField textFieldAddress;
     private JTextField textFieldUserID;
+    public static int generatedPin;
 
     /**
      * Launch the application.
@@ -163,9 +165,8 @@ public class Signup {
                 String userIDStr = textFieldUserID.getText();
                 String password = new String(passwordField.getPassword());
                 String confirmPassword = new String(confirmPasswordField.getPassword());
-                String accountType = (String) comboAccountType.getSelectedItem();  // Get selected account type
+                String accountType = (String) comboAccountType.getSelectedItem();  
                 
-                // Basic validation
                 if (fullName.isEmpty() || email.isEmpty() || phoneStr.isEmpty() || address.isEmpty() || userIDStr.isEmpty() || password.isEmpty()) {
                     JOptionPane.showMessageDialog(frmSignup, "Please fill in all fields", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
@@ -175,27 +176,37 @@ public class Signup {
                     JOptionPane.showMessageDialog(frmSignup, "Passwords do not match", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
+                
+                try {
+                    int phone = Integer.parseInt(phoneStr);
+                    int userID = Integer.parseInt(userIDStr);
 
-                // Convert phone and userID to integers
-                int phone = Integer.parseInt(phoneStr);
-                int userID = Integer.parseInt(userIDStr);
+                    Random random = new Random();
+                    int pin = 10000 + random.nextInt(90000);
+                    generatedPin = pin; // Store the generated PIN
 
-                // Insert the user into the database
-                boolean success = signup_database.insertUser(fullName, email, phone, address, userID, password, confirmPassword, accountType);  // Pass accountType
+                    JOptionPane.showMessageDialog(frmSignup, "Your 5-digit PIN is: " + pin, "PIN Generated", JOptionPane.INFORMATION_MESSAGE);
 
-                if (success) {
-                    JOptionPane.showMessageDialog(frmSignup, "Account created successfully!");
+                    boolean success = signup_database.insertUser(fullName, email, phone, address, userID, password, confirmPassword, accountType, pin);
 
-                    Login login = new Login();
-                    login.setVisible(true);
-                    frmSignup.dispose();
-                } else {
-                    JOptionPane.showMessageDialog(frmSignup, "Error creating account", "Error", JOptionPane.ERROR_MESSAGE);
+                    if (success) {
+                        JOptionPane.showMessageDialog(frmSignup, "Account created successfully!");
+                        Login login = new Login();
+                        login.setVisible(true);
+                        frmSignup.dispose();
+                        
+                    } else {
+                        JOptionPane.showMessageDialog(frmSignup, "Error creating account", "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(frmSignup, "Invalid phone or user ID", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
 
+
         btnSubmit.setFont(new Font("Tahoma", Font.BOLD, 15));
+        
         
         JButton btnCancel = new JButton("Cancel");
         btnCancel.setForeground(new Color(0, 78, 168));
@@ -225,7 +236,7 @@ public class Signup {
         JLabel lblsignUpTo = new JLabel("<html>Sign up to create your online bank account and enjoy secure access to manage your finances, check balances, transfer funds, and more convenient banking at your fingertips.</html>");
         lblsignUpTo.setForeground(new Color(230, 245, 254));
         lblsignUpTo.setFont(new Font("Tahoma", Font.PLAIN, 15));
-        lblsignUpTo.setBounds(38, 222, 314, 84);
+        lblsignUpTo.setBounds(38, 277, 314, 84);
         panel.add(lblsignUpTo);
     }
 
